@@ -4,22 +4,18 @@ using UnityEngine.UI;
 
 public class ShopBehavior : MonoBehaviour
 {
-    private enum ShopType { Seeker, Sniper, Scatter }
+    private enum ShopType { Basic, Sniper, Radius }
     
     [Header("Upgrade Buttons")]
     [SerializeField] private Button speedButton;
     [SerializeField] private Button rangeButton;
-
-    [Header("Shop Switching Buttons")]
-    [SerializeField] private Button nextButton;
-    [SerializeField] private Button previousButton;
     
     [Header("Upgrade Costs")]
     [SerializeField] private int sniperSpeedUpgradeCost = 10;
     [SerializeField] private int sniperRangeUpgradeCost = 15;
-    [SerializeField] private int seekerSpeedUpgradeCost = 20;
-    [SerializeField] private int seekerRangeUpgradeCost = 25;
-    [SerializeField] private int scatterSpeedUpgradeCost = 30;
+    [SerializeField] private int basicSpeedUpgradeCost = 20;
+    [SerializeField] private int basicRangeUpgradeCost = 25;
+    [SerializeField] private int radiusSpeedUpgradeCost = 30;
     [SerializeField] private int bulletCountUpgradeCost = 35;
 
     [Header("Upgrade Labels")]
@@ -31,16 +27,16 @@ public class ShopBehavior : MonoBehaviour
     [SerializeField] private TextMeshProUGUI speedButtonText;
     [SerializeField] private TextMeshProUGUI rangeButtonText;
 
-    private int seekerSpeedLevel = 1;
-    private int seekerRangeLevel = 1;
+    private int basicSpeedLevel = 1;
+    private int basicRangeLevel = 1;
     private int sniperSpeedLevel = 1;
     private int sniperRangeLevel = 1;
-    private int scatterBulletCountLevel = 1;
-    private int scatterSpeedLevel = 1;
+    private int radiusBulletCountLevel = 1;
+    private int radiusSpeedLevel = 1;
     
     private const int maxLevel = 5;
 
-    private ShopType currentShop = ShopType.Seeker;
+    private ShopType currentShop = ShopType.Basic;
 
     private void Start()
     {
@@ -53,10 +49,6 @@ public class ShopBehavior : MonoBehaviour
         speedButton.onClick.AddListener(UpgradeSpeed);
         rangeButton.onClick.AddListener(UpgradeRange);
         
-        // Add listeners for shop switching
-        nextButton.onClick.AddListener(SwitchToNextShop);
-        previousButton.onClick.AddListener(SwitchToPreviousShop);
-        
         UpdateShopUI();
         UpdateUpgradeTexts();
     }
@@ -68,53 +60,53 @@ public class ShopBehavior : MonoBehaviour
 
     private void UpdateButtonState()
 {
-    bool hasSeekerTowers = FindObjectsOfType<BasicTower>().Length > 0;
+    bool hasBasicTowers = FindObjectsOfType<BasicTower>().Length > 0;
     bool hasSniperTowers = FindObjectsOfType<SniperTower>().Length > 0;
-    bool hasScatterTowers = FindObjectsOfType<RadiusTower>().Length > 0;
+    bool hasRadiusTowers = FindObjectsOfType<RadiusTower>().Length > 0;
 
     int speedUpgradeCost = 0;
     int rangeUpgradeCost = 0;
 
     // Set the appropriate upgrade costs based on the current shop
-    if (currentShop == ShopType.Seeker)
+    if (currentShop == ShopType.Basic)
     {
-        speedUpgradeCost = seekerSpeedUpgradeCost;
-        rangeUpgradeCost = seekerRangeUpgradeCost;
+        speedUpgradeCost = basicSpeedUpgradeCost;
+        rangeUpgradeCost = basicRangeUpgradeCost;
     }
     else if (currentShop == ShopType.Sniper)
     {
         speedUpgradeCost = sniperSpeedUpgradeCost;
         rangeUpgradeCost = sniperRangeUpgradeCost;
     }
-    else if (currentShop == ShopType.Scatter)
+    else if (currentShop == ShopType.Radius)
     {
-        speedUpgradeCost = scatterSpeedUpgradeCost; 
+        speedUpgradeCost = radiusSpeedUpgradeCost; 
         rangeUpgradeCost = bulletCountUpgradeCost; // Bullet count cost for scatter
     }
 
     bool canUpgradeSpeed = GameManager.Instance.gold >= speedUpgradeCost &&
-                           (currentShop == ShopType.Seeker ? seekerSpeedLevel < maxLevel :
-                            currentShop == ShopType.Sniper ? sniperSpeedLevel < maxLevel : scatterSpeedLevel < maxLevel);
+                           (currentShop == ShopType.Radius ? basicSpeedLevel < maxLevel :
+                            currentShop == ShopType.Sniper ? sniperSpeedLevel < maxLevel : radiusSpeedLevel < maxLevel);
 
     bool canUpgradeRange = GameManager.Instance.gold >= rangeUpgradeCost &&
-                           (currentShop == ShopType.Seeker ? seekerRangeLevel < maxLevel :
+                           (currentShop == ShopType.Basic ? basicRangeLevel < maxLevel :
                             currentShop == ShopType.Sniper ? sniperRangeLevel < maxLevel :
-                            currentShop == ShopType.Scatter ? scatterBulletCountLevel < maxLevel : false);
+                            currentShop == ShopType.Radius ? radiusBulletCountLevel < maxLevel : false);
 
-    if (currentShop == ShopType.Seeker)
+    if (currentShop == ShopType.Basic)
     {
-        SetButtonState(speedButton, canUpgradeSpeed && hasSeekerTowers, seekerSpeedLevel);
-        SetButtonState(rangeButton, canUpgradeRange && hasSeekerTowers, seekerRangeLevel);
+        SetButtonState(speedButton, canUpgradeSpeed && hasBasicTowers, basicSpeedLevel);
+        SetButtonState(rangeButton, canUpgradeRange && hasBasicTowers, basicRangeLevel);
     }
     else if (currentShop == ShopType.Sniper)
     {
         SetButtonState(speedButton, canUpgradeSpeed && hasSniperTowers, sniperSpeedLevel);
         SetButtonState(rangeButton, canUpgradeRange && hasSniperTowers, sniperRangeLevel);
     }
-    else if (currentShop == ShopType.Scatter)
+    else if (currentShop == ShopType.Radius)
     {
-        SetButtonState(speedButton, canUpgradeSpeed && hasScatterTowers, scatterSpeedLevel);
-        SetButtonState(rangeButton, canUpgradeRange && hasScatterTowers, scatterBulletCountLevel); // Using rangeButton for BulletCount
+        SetButtonState(speedButton, canUpgradeSpeed && hasRadiusTowers, radiusSpeedLevel);
+        SetButtonState(rangeButton, canUpgradeRange && hasRadiusTowers, radiusBulletCountLevel); // Using rangeButton for BulletCount
     }
 }
 
@@ -141,20 +133,20 @@ public class ShopBehavior : MonoBehaviour
         int currentSpeedLevel = 0;
 
         // Determine the current upgrade cost and level based on the shop type
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
-            currentUpgradeCost = seekerSpeedUpgradeCost;
-            currentSpeedLevel = seekerSpeedLevel;
+            currentUpgradeCost = basicSpeedUpgradeCost;
+            currentSpeedLevel = basicSpeedLevel;
         }
         else if (currentShop == ShopType.Sniper)
         {
             currentUpgradeCost = sniperSpeedUpgradeCost;
             currentSpeedLevel = sniperSpeedLevel;
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
-            currentUpgradeCost = scatterSpeedUpgradeCost; // You can define a specific cost for Scatter if necessary
-            currentSpeedLevel = scatterSpeedLevel;
+            currentUpgradeCost = radiusSpeedUpgradeCost; // You can define a specific cost for Radius if necessary
+            currentSpeedLevel = radiusSpeedLevel;
         }
 
         // Check if there is enough gold and if the current level is below the max
@@ -164,15 +156,15 @@ public class ShopBehavior : MonoBehaviour
         // Deduct gold and perform the upgrade
         GameManager.Instance.gold -= currentUpgradeCost;
     
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
             foreach (var turret in FindObjectsOfType<RadiusTower>())
             {
                 turret.UpgradeSpeed(1);  // Adjust as needed
             }
 
-            seekerSpeedUpgradeCost += 5;
-            seekerSpeedLevel++;
+            basicSpeedUpgradeCost += 5;
+            basicSpeedLevel++;
         }
         else if (currentShop == ShopType.Sniper)
         {
@@ -183,14 +175,14 @@ public class ShopBehavior : MonoBehaviour
             sniperSpeedUpgradeCost += 5;
             sniperSpeedLevel++;
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
             foreach (var tower in FindObjectsOfType<RadiusTower>())
             {
                 tower.UpgradeSpeed(1f);  // Adjust as needed
             }
-            scatterSpeedUpgradeCost += 5;
-            scatterSpeedLevel++;
+            radiusSpeedUpgradeCost += 5;
+            radiusSpeedLevel++;
         }
 
         // Update UI and texts after upgrade
@@ -205,17 +197,17 @@ public class ShopBehavior : MonoBehaviour
         int currentRangeLevel = 0;
 
         // Determine the current upgrade cost and level based on the shop type
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
-            currentUpgradeCost = seekerRangeUpgradeCost;
-            currentRangeLevel = seekerRangeLevel;
+            currentUpgradeCost = basicRangeUpgradeCost;
+            currentRangeLevel = basicRangeLevel;
         }
         else if (currentShop == ShopType.Sniper)
         {
             currentUpgradeCost = sniperRangeUpgradeCost;
             currentRangeLevel = sniperRangeLevel;
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
             currentUpgradeCost = bulletCountUpgradeCost; 
         }
@@ -225,14 +217,14 @@ public class ShopBehavior : MonoBehaviour
 
         GameManager.Instance.gold -= currentUpgradeCost;
     
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
             foreach (var turret in FindObjectsOfType<RadiusTower>())
             {
                 turret.UpgradeRange(0.3f); 
             }
-            seekerRangeUpgradeCost += 5;
-            seekerRangeLevel++;
+            basicRangeUpgradeCost += 5;
+            basicRangeLevel++;
         }
         else if (currentShop == ShopType.Sniper)
         {
@@ -243,14 +235,14 @@ public class ShopBehavior : MonoBehaviour
             sniperRangeUpgradeCost += 5;
             sniperRangeLevel++;
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
             foreach (var tower in FindObjectsOfType<RadiusTower>())
             {
                 tower.IncreaseBulletCount(1); 
             }
             bulletCountUpgradeCost += 5;
-            scatterBulletCountLevel++;
+            radiusBulletCountLevel++;
         }
 
         // Update UI and texts after upgrade
@@ -258,47 +250,31 @@ public class ShopBehavior : MonoBehaviour
         GameManager.Instance.UpdateUI();
     }
 
-
-
-    private void SwitchToNextShop()
-    {
-        currentShop = (currentShop == ShopType.Seeker) ? ShopType.Sniper : 
-            (currentShop == ShopType.Sniper) ? ShopType.Scatter : ShopType.Seeker;
-        UpdateShopUI();
-    }
-
-    private void SwitchToPreviousShop()
-    {
-        currentShop = (currentShop == ShopType.Sniper) ? ShopType.Seeker : 
-            (currentShop == ShopType.Scatter) ? ShopType.Sniper : ShopType.Scatter;
-        UpdateShopUI();
-    }
-
     private void UpdateShopUI()
     {
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
-            shopTitle.text = "Seeker Tower Upgrades";
+            shopTitle.text = "Basic Tower Upgrades";
         }
         else if (currentShop == ShopType.Sniper)
         {
             shopTitle.text = "Sniper Tower Upgrades";
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
-            shopTitle.text = "Scatter Tower Upgrades";
+            shopTitle.text = "Radius Tower Upgrades";
         }
         UpdateUpgradeTexts();
     }
 
     private void UpdateUpgradeTexts()
     {
-        if (currentShop == ShopType.Seeker)
+        if (currentShop == ShopType.Basic)
         {
-            speedText.text = "Attack Speed Lvl. " + seekerSpeedLevel;
-            rangeText.text = "Tower Range Lvl. " + seekerRangeLevel;
-            speedButtonText.text = seekerSpeedUpgradeCost + " Gold";
-            rangeButtonText.text = seekerRangeUpgradeCost + " Gold";
+            speedText.text = "Attack Speed Lvl. " + basicSpeedLevel;
+            rangeText.text = "Tower Range Lvl. " + basicRangeLevel;
+            speedButtonText.text = basicSpeedUpgradeCost + " Gold";
+            rangeButtonText.text = basicRangeUpgradeCost + " Gold";
         }
         else if (currentShop == ShopType.Sniper)
         {
@@ -307,23 +283,23 @@ public class ShopBehavior : MonoBehaviour
             speedButtonText.text = sniperSpeedUpgradeCost + " Gold";
             rangeButtonText.text = sniperRangeUpgradeCost + " Gold";
         }
-        else if (currentShop == ShopType.Scatter)
+        else if (currentShop == ShopType.Radius)
         {
-            speedText.text = "Attack Speed Lvl. " + scatterSpeedLevel;
-            rangeText.text = "Bullet Count Lvl. " + scatterBulletCountLevel;
-            speedButtonText.text = scatterSpeedUpgradeCost + " Gold";
+            speedText.text = "Attack Speed Lvl. " + radiusSpeedLevel;
+            rangeText.text = "Bullet Count Lvl. " + radiusBulletCountLevel;
+            speedButtonText.text = radiusSpeedUpgradeCost + " Gold";
             rangeButtonText.text = bulletCountUpgradeCost + " Gold";
         }
     }
     public int GetSpeedLevel()
     {
-        return (currentShop == ShopType.Seeker) ? seekerSpeedLevel : 
-            (currentShop == ShopType.Sniper) ? sniperSpeedLevel : scatterSpeedLevel;
+        return (currentShop == ShopType.Basic) ? basicSpeedLevel : 
+            (currentShop == ShopType.Sniper) ? sniperSpeedLevel : radiusSpeedLevel;
     }
 
     public int GetRangeLevel()
     {
-        return (currentShop == ShopType.Seeker) ? seekerRangeLevel : 
-            (currentShop == ShopType.Sniper) ? sniperRangeLevel : scatterBulletCountLevel;
+        return (currentShop == ShopType.Basic) ? basicRangeLevel : 
+            (currentShop == ShopType.Sniper) ? sniperRangeLevel : radiusBulletCountLevel;
     }
 }

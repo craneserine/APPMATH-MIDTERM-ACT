@@ -26,13 +26,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 842959474766364469}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.7372774, w: 0.67559016}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 608.8845, y: 217.78526, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 95}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!212 &9201690614995641864
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -100,3 +100,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b03edc244a839f4b8cb440f1a6929e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  turretRange: 4
+  bulletPrefab: {fileID: 0}
+  bulletSpeed: 4
+  fireInterval: 0.7
+  bulletKillDistance: 0.8
+  maxRotationSpeed: 360
+  fireAngleThreshold: 10
+  baseBulletSpeed: 4
+  baseTurretRange: 4
