@@ -1,16 +1,8 @@
-using UnityEngine;
+[System.Serializable]
+public class Wave
 
-public class Wave : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public int enemyCount;
+    public float spawnInterval;
+    public MovementType movementType;
 }

@@ -1,16 +1,21 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SceneSwitch : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void StartGame()
     {
-        
+        SceneManager.LoadScene("Game");
+    }
+    
+    public void MainMenu()
+    {
+        SceneManager.LoadScene("Start");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void QuitGame()
     {
-        
+        Debug.Log("Quit Game");
+        Application.Quit();
     }
 }
